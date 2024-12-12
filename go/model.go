@@ -22,6 +22,7 @@ type UpdateMsg struct {
 		} `json:"errs"`
 	} `json:"data"`
 	RequestId string `json:"request_id"`
+	Ack       bool   `json:"ack"`
 }
 
 type ResponseHeader struct {
