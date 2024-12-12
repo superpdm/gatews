@@ -21,6 +21,7 @@ type UpdateMsg struct {
 			Message string `json:"message"`
 		} `json:"errs"`
 	} `json:"data"`
+	RequestId string `json:"request_id"`
 }
 
 type ResponseHeader struct {
