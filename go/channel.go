@@ -250,16 +250,23 @@ func (ws *WsService) login() error {
 	msgCh, ok := ws.msgChs.Load(channel)
 	if !ok {
 		msgCh = make(chan *UpdateMsg, 1)
-		go ws.receiveCallMsg(channel, msgCh.(chan *UpdateMsg))
-	}
-
-	if _, ok := ws.msgChs.Load(channel); !ok {
 		ws.msgChs.Store(channel, msgCh)
 	}
-
 	ws.readMsg()
 
-	return ws.apiRequest(channel, nil, nil)
+	err := ws.apiRequest(channel, nil, nil)
+	if err != nil {
+		return err
+	}
+
+	msg := <-msgCh.(chan *UpdateMsg)
+	if msg.Error != nil {
+		return msg.Error
+	}
+	if msg.Data.Errs != nil {
+		return fmt.Errorf(msg.Data.Errs.Message)
+	}
+	return nil
 }
 
 func (ws *WsService) apiRequest(channel string, payload any, keyVals map[string]any) error {
